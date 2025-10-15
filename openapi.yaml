@@ -1,0 +1,244 @@
+openapi: 3.0.3
+info:
+  title: Adesk Ticket Service API
+  version: "1.0.0"
+  description: |
+    Ticketing API for the Adesk platform.
+
+    Supports multi-tenant access via the `X-Tenant-Id` header.
+    - List tickets (filter by status, assignee) with pagination
+    - Get ticket by ID
+    - Create ticket
+    - Modify ticket status and assignee
+
+servers:
+  - url: http://localhost:4000
+    description: Local dev
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: tickets
+    description: Ticket CRUD
+
+paths:
+  /tickets:
+    get:
+      tags: [tickets]
+      summary: List tickets
+      operationId: listTickets
+      parameters:
+        - $ref: "#/components/parameters/XTenantId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/status"
+        - $ref: "#/components/parameters/assignee"
+      responses:
+        "200":
+          description: Paginated list of tickets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketList"
+    post:
+      tags: [tickets]
+      summary: Create a ticket
+      operationId: createTicket
+      parameters:
+        - $ref: "#/components/parameters/XTenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+
+  /tickets/{ticketId}:
+    parameters:
+      - $ref: "#/components/parameters/ticketId"
+    get:
+      tags: [tickets]
+      summary: Get a ticket by ID
+      operationId: getTicket
+      parameters:
+        - $ref: "#/components/parameters/XTenantId"
+      responses:
+        "200":
+          description: Ticket
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+    patch:
+      tags: [tickets]
+      summary: Update ticket status or assignee
+      operationId: updateTicket
+      parameters:
+        - $ref: "#/components/parameters/XTenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketUpdate"
+      responses:
+        "200":
+          description: Updated ticket
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenantId:
+      name: X-Tenant-Id
+      in: header
+      description: Tenant identifier (organization or workspace ID)
+      required: true
+      schema:
+        type: string
+        example: "tenant_123"
+
+    ticketId:
+      name: ticketId
+      in: path
+      required: true
+      description: Ticket UUID
+      schema:
+        type: string
+        format: uuid
+
+    limit:
+      name: limit
+      in: query
+      required: false
+      description: Page size (1–100, default 20)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    offset:
+      name: offset
+      in: query
+      required: false
+      description: Items to skip (default 0)
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+    status:
+      name: status
+      in: query
+      required: false
+      description: Filter by status
+      schema:
+        $ref: "#/components/schemas/TicketStatus"
+
+    assignee:
+      name: assignee
+      in: query
+      required: false
+      description: Filter by assignee username
+      schema:
+        type: string
+        nullable: true
+
+  schemas:
+    TicketStatus:
+      type: string
+      enum: [OPEN, IN_PROGRESS, RESOLVED, CLOSED]
+
+    Ticket:
+      type: object
+      required: [id, title, description, status, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+          default: ""
+        status:
+          $ref: "#/components/schemas/TicketStatus"
+        assignee:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TicketCreate:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          default: ""
+        assignee:
+          type: string
+          nullable: true
+
+    TicketUpdate:
+      type: object
+      description: Only status and/or assignee can be updated
+      properties:
+        status:
+          $ref: "#/components/schemas/TicketStatus"
+        assignee:
+          type: string
+          nullable: true
+      additionalProperties: false
+
+    TicketList:
+      type: object
+      required: [total, limit, offset, items]
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ticket"
+
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
