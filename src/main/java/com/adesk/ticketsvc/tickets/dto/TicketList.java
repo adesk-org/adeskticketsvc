@@ -1,7 +1,9 @@
-package com.adesk.ticketsvc.dto;
+package com.adesk.ticketsvc.tickets.dto;
 
 import java.util.List;
+
 import com.adesk.ticketsvc.model.TicketEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

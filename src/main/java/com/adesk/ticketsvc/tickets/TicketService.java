@@ -1,22 +1,23 @@
-package com.adesk.ticketsvc.service;
+package com.adesk.ticketsvc.tickets;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import com.adesk.ticketsvc.dto.TicketCreate;
-import com.adesk.ticketsvc.dto.TicketUpdate;
+
 import com.adesk.ticketsvc.model.TicketEntity;
 import com.adesk.ticketsvc.model.TicketStatus;
 import com.adesk.ticketsvc.outbox.OutboxEntity;
 import com.adesk.ticketsvc.outbox.OutboxRepository;
-import com.adesk.ticketsvc.repo.TicketRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.adesk.ticketsvc.tickets.dto.TicketCreate;
+import com.adesk.ticketsvc.tickets.dto.TicketUpdate;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -83,13 +84,12 @@ public class TicketService {
                             t.getId().toString(), "aggregateType", "Ticket"),
                     "data", Map.of("ticketId", t.getId().toString(), "title", t.getTitle(),
                             "status", t.getStatus().toString(), "assignee", t.getAssignee()));
-            String json = mapper.writeValueAsString(payload);
 
             OutboxEntity entity = OutboxEntity.builder().tenantId(tenantId).topic(ticketTopic)
                     .recordKey(tenantId + ":" + t.getId()).payload(payload)
                     .createdAt(OffsetDateTime.now()).build();
             outboxRepo.save(entity);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to record outbox event", e);
         }
     }
