@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.adesk.ticketsvc.dto.TicketCreate;
+import com.adesk.ticketsvc.dto.TicketUpdate;
 import com.adesk.ticketsvc.model.TicketEntity;
 import com.adesk.ticketsvc.model.TicketStatus;
 import com.adesk.ticketsvc.repo.TicketRepository;
@@ -31,8 +32,7 @@ public class TicketService {
         t.setDescription(req.getDescription());
         t.setAssignee(req.getAssignee());
         t.setStatus(TicketStatus.OPEN);
-        t = repo.save(t);
-        return t;
+        return repo.save(t);
     }
 
     public List<TicketEntity> list(UUID tenantId, Integer limit, Integer offset,
@@ -46,5 +46,19 @@ public class TicketService {
 
     public int count(UUID tenantId, TicketStatus status, String assignee) {
         return repo.countByFilters(tenantId, status, assignee);
+    }
+
+    public TicketEntity update(UUID tenantId, UUID ticketId, TicketUpdate req) {
+        TicketEntity t = get(tenantId, ticketId);
+        if (req.getStatus() != null) {
+            t.setStatus(req.getStatus());
+        }
+
+        // Apply assignee only if provided; null means unassign
+        if (req.isAssigneePresent()) {
+            t.setAssignee(req.getAssignee());
+        }
+
+        return repo.save(t);
     }
 }

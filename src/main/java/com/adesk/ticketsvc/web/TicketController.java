@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.adesk.ticketsvc.dto.TicketCreate;
 import com.adesk.ticketsvc.dto.TicketList;
+import com.adesk.ticketsvc.dto.TicketUpdate;
 import com.adesk.ticketsvc.model.TicketEntity;
 import com.adesk.ticketsvc.model.TicketStatus;
 import com.adesk.ticketsvc.service.TicketService;
@@ -54,6 +56,17 @@ public class TicketController {
         try {
             TicketEntity t = svc.get(tenantId, ticketId);
             return ResponseEntity.ok(t);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{ticketId}")
+    public ResponseEntity<TicketEntity> patch(HttpServletRequest req, @PathVariable UUID ticketId,
+            @RequestBody TicketUpdate body) {
+        UUID tenantId = UUID.fromString("bee1e4b2-1c7a-4944-92aa-b0dde5088c87");
+        try {
+            return ResponseEntity.ok(svc.update(tenantId, ticketId, body));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
