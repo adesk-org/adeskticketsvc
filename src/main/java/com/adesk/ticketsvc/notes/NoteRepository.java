@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import com.adesk.ticketsvc.notes.model.NoteEntity;
 
 public interface NoteRepository extends JpaRepository<NoteEntity, UUID> {
 

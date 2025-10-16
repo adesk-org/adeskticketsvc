@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import com.adesk.ticketsvc.notes.dto.CreateNoteRequest;
+import com.adesk.ticketsvc.notes.model.NoteEntity;
 import lombok.RequiredArgsConstructor;
 
 @Service

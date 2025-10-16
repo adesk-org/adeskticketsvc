@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.adesk.ticketsvc.tickets.model.TicketEntity;
+import com.adesk.ticketsvc.tickets.model.TicketStatus;
 
 public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
 

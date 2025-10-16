@@ -1,4 +1,4 @@
-package com.adesk.ticketsvc.outbox;
+package com.adesk.ticketsvc.outbox.model;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

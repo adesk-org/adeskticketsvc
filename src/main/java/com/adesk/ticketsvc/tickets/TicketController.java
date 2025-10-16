@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.adesk.ticketsvc.tickets.dto.TicketCreate;
 import com.adesk.ticketsvc.tickets.dto.TicketList;
 import com.adesk.ticketsvc.tickets.dto.TicketUpdate;
+import com.adesk.ticketsvc.tickets.model.TicketEntity;
+import com.adesk.ticketsvc.tickets.model.TicketStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 

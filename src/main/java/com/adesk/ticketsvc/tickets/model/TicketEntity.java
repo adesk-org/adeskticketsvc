@@ -1,10 +1,14 @@
-package com.adesk.ticketsvc.notes;
+package com.adesk.ticketsvc.tickets.model;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -19,8 +23,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "notes")
-public class NoteEntity {
+@Table(name = "tickets")
+public class TicketEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -29,23 +33,19 @@ public class NoteEntity {
     @Column(name = "tenant_id", nullable = false, updatable = false)
     private UUID tenantId;
 
-    @Column(name = "ticket_id", nullable = false, updatable = false)
-    private UUID ticketId;
+    @Column(name = "title", nullable = false)
+    private String title;
 
-    @Column(name = "seq", nullable = false, updatable = false)
-    private Integer seq;
+    @Column(name = "description", nullable = false)
+    private String description;
 
-    @Column(name = "content", nullable = false, columnDefinition = "text")
-    private String content;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "ticket_status")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private TicketStatus status;
 
-    @Column(name = "author_name", nullable = false, length = 120)
-    private String author;
-
-    @Column(name = "is_private", nullable = false)
-    private Boolean isPrivate;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted;
+    @Column(name = "assignee")
+    private String assignee;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
