@@ -16,7 +16,7 @@ public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
             SELECT t FROM TicketEntity t
             WHERE t.tenantId = :tenantId
                 AND (COALESCE(:status, t.status) = t.status)
-                AND (COALESCE(:assignee, t.assignee) = t.assignee)
+                AND (:assignee IS NULL OR t.assignee = :assignee)
                 """)
     Page<TicketEntity> pageByFilters(@Param("tenantId") UUID tenantId,
             @Param("status") TicketStatus status, @Param("assignee") String assignee,
@@ -27,7 +27,7 @@ public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
             SELECT COUNT(t) from TicketEntity t
             WHERE t.tenantId = :tenantId
                 AND (COALESCE(:status, t.status) = t.status)
-                AND (COALESCE(:assignee, t.assignee) = t.assignee)
+                AND (:assignee IS NULL OR t.assignee = :assignee)
             """)
     int countByFilters(@Param("tenantId") UUID tenantId, @Param("status") TicketStatus status,
             @Param("assignee") String assignee);
