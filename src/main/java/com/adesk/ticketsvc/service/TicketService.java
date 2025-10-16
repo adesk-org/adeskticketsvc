@@ -86,7 +86,7 @@ public class TicketService {
             String json = mapper.writeValueAsString(payload);
 
             OutboxEntity entity = OutboxEntity.builder().tenantId(tenantId).topic(ticketTopic)
-                    .recordKey(tenantId + ":" + t.getId()).payload(json)
+                    .recordKey(tenantId + ":" + t.getId()).payload(payload)
                     .createdAt(OffsetDateTime.now()).build();
             outboxRepo.save(entity);
         } catch (JsonProcessingException e) {

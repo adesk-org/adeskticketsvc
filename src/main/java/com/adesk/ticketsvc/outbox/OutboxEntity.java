@@ -2,6 +2,8 @@ package com.adesk.ticketsvc.outbox;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,8 +36,9 @@ public class OutboxEntity {
     @Column(name = "record_key", nullable = false)
     private String recordKey;
 
-    @Column(columnDefinition = "jsonb", nullable = false)
-    private String payload;
+    // @Column(columnDefinition = "jsonb", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private java.util.Map<String, Object> payload;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
