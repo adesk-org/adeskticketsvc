@@ -2,6 +2,8 @@ package com.adesk.ticketsvc.model;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,7 +39,8 @@ public class TicketEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "ticket_status")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private TicketStatus status;
 
     @Column(name = "assignee")
