@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateNoteRequest {
+
     @NotBlank
     @Size(max = 50000)
-    private String body;
+    private String content;
 }

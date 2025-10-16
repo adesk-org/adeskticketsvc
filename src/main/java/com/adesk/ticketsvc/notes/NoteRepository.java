@@ -15,13 +15,14 @@ public interface NoteRepository extends JpaRepository<NoteEntity, UUID> {
                 AND n.ticketId = :ticketId
                 AND n.isDeleted = false
             """)
-    List<NoteEntity> findActiveByTicket(UUID tenantId, UUID ticketId);
+    List<NoteEntity> findByTenantTicket(UUID tenantId, UUID ticketId);
 
     @Query("""
             SELECT n FROM NoteEntity n
             WHERE n.id = :noteId
                 AND n.tenantId = :tenantId
                 AND n.ticketId = :ticketId
+                AND n.isDeleted = false
             """)
-    Optional<NoteEntity> findOneForTenantTicket(UUID tenantId, UUID ticketId, UUID noteId);
+    Optional<NoteEntity> getForTenantTicket(UUID tenantId, UUID ticketId, UUID noteId);
 }
