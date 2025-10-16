@@ -36,7 +36,6 @@ public class OutboxEntity {
     @Column(name = "record_key", nullable = false)
     private String recordKey;
 
-    // @Column(columnDefinition = "jsonb", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
     private java.util.Map<String, Object> payload;
 
