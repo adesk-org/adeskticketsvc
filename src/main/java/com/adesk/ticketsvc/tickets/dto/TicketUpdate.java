@@ -1,9 +1,8 @@
 package com.adesk.ticketsvc.tickets.dto;
 
-import com.adesk.ticketsvc.model.TicketStatus;
+import com.adesk.ticketsvc.tickets.TicketStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

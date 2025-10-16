@@ -1,4 +1,4 @@
-package com.adesk.ticketsvc.model;
+package com.adesk.ticketsvc.tickets;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

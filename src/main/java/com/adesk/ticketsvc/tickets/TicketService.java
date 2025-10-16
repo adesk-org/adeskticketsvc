@@ -5,19 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import com.adesk.ticketsvc.model.TicketEntity;
-import com.adesk.ticketsvc.model.TicketStatus;
 import com.adesk.ticketsvc.outbox.OutboxEntity;
 import com.adesk.ticketsvc.outbox.OutboxRepository;
 import com.adesk.ticketsvc.tickets.dto.TicketCreate;
 import com.adesk.ticketsvc.tickets.dto.TicketUpdate;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

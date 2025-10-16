@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,13 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.adesk.ticketsvc.model.TicketEntity;
-import com.adesk.ticketsvc.model.TicketStatus;
 import com.adesk.ticketsvc.tickets.dto.TicketCreate;
 import com.adesk.ticketsvc.tickets.dto.TicketList;
 import com.adesk.ticketsvc.tickets.dto.TicketUpdate;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
