@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS tickets (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Helpful indexes for tenant-scoped queries
 CREATE INDEX IF NOT EXISTS idx_tickets_tenant_created ON tickets(tenant_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_tickets_tenant_status ON tickets(tenant_id, status);
 CREATE INDEX IF NOT EXISTS idx_tickets_tenant_assignee ON tickets(tenant_id, assignee);
