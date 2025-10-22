@@ -74,13 +74,15 @@ public class TicketService {
 
     private void recordOutbox(UUID tenantId, TicketEntity t, String eventName) {
         try {
-            Map<String, Object> payload = Map.of("meta",
-                    Map.of("eventId", UUID.randomUUID().toString(), "occurredAt",
-                            OffsetDateTime.now().toString(), "tenantId", tenantId.toString(),
-                            "domain", "ticket", "name", eventName, "version", 1, "aggregateId",
-                            t.getId().toString(), "aggregateType", "Ticket"),
-                    "data", Map.of("ticketId", t.getId().toString(), "title", t.getTitle(),
-                            "status", t.getStatus().toString(), "assignee", t.getAssignee()));
+            Map<String, Object> payload = Map.of("meta", Map.of("eventId",
+                    UUID.randomUUID().toString(), "occurredAt", OffsetDateTime.now().toString(),
+                    "tenantId", tenantId.toString(), "domain", "ticket", "name", eventName,
+                    "version", 1, "aggregateId", t.getId().toString(), "aggregateType", "Ticket"),
+                    "data",
+                    Map.of("ticketId", t.getId().toString(), "title", t.getTitle(), "status",
+                            t.getStatus().toString(), "description", t.getDescription(), "assignee",
+                            t.getAssignee(), "createdAt", t.getCreatedAt(), "updatedAt",
+                            t.getUpdatedAt()));
 
             OutboxEntity entity = OutboxEntity.builder().tenantId(tenantId).topic(ticketTopic)
                     .recordKey(tenantId + ":" + t.getId()).payload(payload)
