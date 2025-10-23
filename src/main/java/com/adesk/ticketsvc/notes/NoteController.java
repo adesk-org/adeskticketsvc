@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.adesk.ticketsvc.notes.dto.CreateNoteRequest;
+import com.adesk.ticketsvc.notes.dto.NoteList;
 import com.adesk.ticketsvc.notes.dto.UpdateNoteRequest;
 import com.adesk.ticketsvc.notes.model.NoteEntity;
 import jakarta.validation.Valid;
@@ -25,9 +27,12 @@ public class NoteController {
     private final NoteService service;
 
     @GetMapping
-    public List<NoteEntity> listNotes(@PathVariable UUID ticketId) {
+    public NoteList listNotes(@PathVariable UUID ticketId, @RequestParam Integer limit,
+            @RequestParam Integer offset) {
         UUID tenantId = UUID.fromString("bee1e4b2-1c7a-4944-92aa-b0dde5088c87");
-        return service.list(tenantId, ticketId);
+        List<NoteEntity> items = service.list(tenantId, ticketId, limit, offset);
+        int total = service.count(tenantId, ticketId);
+        return new NoteList(total, limit, offset, items);
     }
 
     @GetMapping("/{noteId}")

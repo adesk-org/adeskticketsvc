@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.data.domain.AbstractPageRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,8 @@ public class TicketService {
         int l = Math.min(1000, Math.max(1, limit));
         int o = Math.max(0, offset);
         int page = o / l;
-        var pageable = PageRequest.of(page, l, Sort.by(Sort.Direction.DESC, "createdAt"));
+        AbstractPageRequest pageable =
+                PageRequest.of(page, l, Sort.by(Sort.Direction.DESC, "createdAt"));
         return ticketRepo.pageByFilters(tenantId, status, assignee, pageable).getContent();
     }
 

@@ -18,7 +18,6 @@ import com.adesk.ticketsvc.tickets.dto.TicketList;
 import com.adesk.ticketsvc.tickets.dto.TicketUpdate;
 import com.adesk.ticketsvc.tickets.model.TicketEntity;
 import com.adesk.ticketsvc.tickets.model.TicketStatus;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -31,8 +30,8 @@ public class TicketController {
     }
 
     @GetMapping
-    public TicketList list(HttpServletRequest req, @RequestParam Integer limit,
-            @RequestParam Integer offset, @RequestParam(required = false) TicketStatus status,
+    public TicketList list(@RequestParam Integer limit, @RequestParam Integer offset,
+            @RequestParam(required = false) TicketStatus status,
             @RequestParam(required = false) String assignee) {
         UUID tenantId = UUID.fromString("bee1e4b2-1c7a-4944-92aa-b0dde5088c87");
         List<TicketEntity> items = svc.list(tenantId, limit, offset, status, assignee);
@@ -41,8 +40,7 @@ public class TicketController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketEntity> create(HttpServletRequest req,
-            @Valid @RequestBody TicketCreate body) {
+    public ResponseEntity<TicketEntity> create(@Valid @RequestBody TicketCreate body) {
         UUID tenantId = UUID.fromString("bee1e4b2-1c7a-4944-92aa-b0dde5088c87");
         TicketEntity createdTicket = svc.create(tenantId, body);
         return ResponseEntity.created(URI.create("/tickets/" + createdTicket.getId()))
@@ -50,7 +48,7 @@ public class TicketController {
     }
 
     @GetMapping("/{ticketId}")
-    public ResponseEntity<TicketEntity> get(HttpServletRequest req, @PathVariable UUID ticketId) {
+    public ResponseEntity<TicketEntity> get(@PathVariable UUID ticketId) {
         UUID tenantId = UUID.fromString("bee1e4b2-1c7a-4944-92aa-b0dde5088c87");
         try {
             TicketEntity t = svc.get(tenantId, ticketId);
@@ -61,7 +59,7 @@ public class TicketController {
     }
 
     @PatchMapping("/{ticketId}")
-    public ResponseEntity<TicketEntity> patch(HttpServletRequest req, @PathVariable UUID ticketId,
+    public ResponseEntity<TicketEntity> patch(@PathVariable UUID ticketId,
             @RequestBody TicketUpdate body) {
         UUID tenantId = UUID.fromString("bee1e4b2-1c7a-4944-92aa-b0dde5088c87");
         try {

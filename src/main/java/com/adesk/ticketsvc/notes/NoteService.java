@@ -2,6 +2,9 @@ package com.adesk.ticketsvc.notes;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.AbstractPageRequest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,8 +19,14 @@ public class NoteService {
 
     private final NoteRepository noteRepo;
 
-    public List<NoteEntity> list(UUID tenantId, UUID ticketId) {
-        return noteRepo.findByTenantTicket(tenantId, ticketId);
+    public List<NoteEntity> list(UUID tenantId, UUID ticketId, Integer limit, Integer offset) {
+        int l = Math.min(1000, Math.max(1, limit));
+        int o = Math.max(0, offset);
+        int page = o / l;
+        AbstractPageRequest pageable =
+                PageRequest.of(page, l, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return noteRepo.pageByFilters(tenantId, ticketId, pageable).getContent();
     }
 
     public NoteEntity get(UUID tenantId, UUID ticketId, UUID noteId) {
@@ -46,5 +55,9 @@ public class NoteService {
     public void delete(UUID tenantId, UUID ticketId, UUID noteId) {
         NoteEntity n = get(tenantId, ticketId, noteId);
         n.setIsDeleted(true);
+    }
+
+    public int count(UUID tenantId, UUID ticketId) {
+        return noteRepo.countByFilters(tenantId, ticketId);
     }
 }
