@@ -1,4 +1,4 @@
-package com.adesk.ticketsvc.config;
+package com.adesk.ticketsvc.common;
 
 import java.io.IOException;
 import org.springframework.stereotype.Component;
