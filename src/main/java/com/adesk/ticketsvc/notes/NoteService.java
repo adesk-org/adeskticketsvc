@@ -1,6 +1,7 @@
 package com.adesk.ticketsvc.notes;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +21,6 @@ import com.adesk.ticketsvc.notes.mapper.NoteMapper;
 import com.adesk.ticketsvc.notes.model.NoteEntity;
 import com.adesk.ticketsvc.outbox.OutboxRepository;
 import com.adesk.ticketsvc.outbox.model.OutboxEntity;
-import com.adesk.ticketsvc.tickets.model.TicketEntity;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,7 +31,7 @@ public class NoteService {
     private final OutboxRepository outboxRepo;
     private final NoteMapper mapper;
 
-    private final String ticketTopic = "note.events.v1";
+    private final String ticketTopic = "ticket.events.v1";
 
     @Transactional(readOnly = true)
     public NoteList list(UUID tenantId, UUID ticketId, Integer limit, Integer offset) {
@@ -63,6 +63,7 @@ public class NoteService {
                 NoteEntity.builder().tenantId(tenantId).ticketId(ticketId).content(req.content())
                         .authorName(req.authorName()).isPrivate(false).isDeleted(false).build();
         e = noteRepo.saveAndFlush(e);
+        recordOutbox(tenantId, e, "note.created");
         return mapper.toDto(e);
     }
 
@@ -73,6 +74,7 @@ public class NoteService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
         e.setContent(req.content());
+        recordOutbox(tenantId, e, "note.updated");
         return mapper.toDto(e);
     }
 
@@ -83,24 +85,34 @@ public class NoteService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
         e.setIsDeleted(true);
+        recordOutbox(tenantId, e, "note.deleted");
     }
 
-    private void recordOutbox(UUID tenantId, TicketEntity t, String eventName) {
+    private void recordOutbox(UUID tenantId, NoteEntity n, String eventType) {
         try {
-            Map<String, Object> payload = Map.of("meta", Map.of("eventId",
-                    UUID.randomUUID().toString(), "occurredAt", OffsetDateTime.now().toString(),
-                    "tenantId", tenantId.toString(), "domain", "ticket", "name", eventName,
-                    "version", 1, "aggregateId", t.getId().toString(), "aggregateType", "Ticket"),
-                    "data",
-                    Map.of("ticketId", t.getId().toString(), "title", t.getTitle(), "status",
-                            t.getStatus().toString(), "description", t.getDescription(), "assignee",
-                            t.getAssignee(), "createdAt", t.getCreatedAt(), "updatedAt",
-                            t.getUpdatedAt()));
+            Map<String, Object> meta = new HashMap<>();
+            meta.put("eventId", UUID.randomUUID().toString());
+            meta.put("tenantId", tenantId.toString());
+            meta.put("occurredAt", OffsetDateTime.now().toString());
+            meta.put("domain", "ticket");
+            meta.put("type", eventType);
+            meta.put("version", 1);
+            meta.put("aggregateId", n.getId().toString());
+            meta.put("aggregateType", "Note");
 
-            OutboxEntity entity = OutboxEntity.builder().tenantId(tenantId).topic(ticketTopic)
-                    .recordKey(tenantId + ":" + t.getId()).payload(payload)
+            Map<String, Object> data = new HashMap<>();
+            data.put("noteId", n.getId().toString());
+            data.put("content", n.getContent());
+            data.put("authorName", n.getAuthorName());
+            data.put("createdAt", n.getCreatedAt());
+            data.put("updatedAt", n.getUpdatedAt());
+
+            Map<String, Object> payload = Map.of("meta", meta, "data", data);
+
+            OutboxEntity o = OutboxEntity.builder().tenantId(tenantId).topic(ticketTopic)
+                    .recordKey(tenantId + ":" + n.getId()).payload(payload)
                     .createdAt(OffsetDateTime.now()).build();
-            outboxRepo.save(entity);
+            outboxRepo.save(o);
         } catch (Exception e) {
             throw new RuntimeException("Failed to record outbox event", e);
         }

@@ -1,4 +1,4 @@
-.PHONY: docker-build docker-run drop-db run
+.PHONY: docker-build docker-run drop-db kafka-consumer run
 
 docker-build:
 	docker build -t adeskticketsvc:latest .
@@ -20,6 +20,9 @@ drop-db:
 		-Dflyway.user=adesk_admin \
 		-Dflyway.password=adesk_password \
 		-Dflyway.schemas=ticket
+
+kafka-consumer:
+	kafka-console-consumer --bootstrap-server localhost:9092 --topic "ticket.events.v1"
 
 run:
 	mvn spring-boot:run

@@ -1,6 +1,7 @@
 package com.adesk.ticketsvc.tickets;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -15,7 +16,6 @@ import com.adesk.ticketsvc.tickets.dto.TicketCreate;
 import com.adesk.ticketsvc.tickets.dto.TicketUpdate;
 import com.adesk.ticketsvc.tickets.model.TicketEntity;
 import com.adesk.ticketsvc.tickets.model.TicketStatus;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class TicketService {
     private final TicketRepository ticketRepo;
     private final OutboxRepository outboxRepo;
-    private final ObjectMapper mapper = new ObjectMapper();
 
     private final String ticketTopic = "ticket.events.v1";
 
@@ -39,7 +38,7 @@ public class TicketService {
         t.setDescription(req.getDescription());
         t.setAssignee(req.getAssignee());
         t.setStatus(TicketStatus.OPEN);
-        ticketRepo.save(t);
+        t = ticketRepo.save(t);
         recordOutbox(tenantId, t, "ticket.created");
         return t;
     }
@@ -74,17 +73,30 @@ public class TicketService {
         return t;
     }
 
-    private void recordOutbox(UUID tenantId, TicketEntity t, String eventName) {
+    private void recordOutbox(UUID tenantId, TicketEntity t, String eventType) {
         try {
-            Map<String, Object> payload = Map.of("meta", Map.of("eventId",
-                    UUID.randomUUID().toString(), "occurredAt", OffsetDateTime.now().toString(),
-                    "tenantId", tenantId.toString(), "domain", "ticket", "name", eventName,
-                    "version", 1, "aggregateId", t.getId().toString(), "aggregateType", "Ticket"),
-                    "data",
-                    Map.of("ticketId", t.getId().toString(), "title", t.getTitle(), "status",
-                            t.getStatus().toString(), "description", t.getDescription(), "assignee",
-                            t.getAssignee(), "createdAt", t.getCreatedAt(), "updatedAt",
-                            t.getUpdatedAt()));
+            Map<String, Object> meta = new HashMap<>();
+            meta.put("eventId", UUID.randomUUID().toString());
+            meta.put("tenantId", tenantId.toString());
+            meta.put("occurredAt", OffsetDateTime.now().toString());
+            meta.put("domain", "ticket");
+            meta.put("type", eventType);
+            meta.put("version", 1);
+            meta.put("aggregateId", t.getId().toString());
+            meta.put("aggregateType", "Ticket");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("ticketId", t.getId().toString());
+            data.put("title", t.getTitle());
+            data.put("status", t.getStatus().toString());
+            data.put("description", t.getDescription());
+            if (t.getAssignee() != null) {
+                data.put("assignee", t.getAssignee());
+            }
+            data.put("createdAt", t.getCreatedAt());
+            data.put("updatedAt", t.getUpdatedAt());
+
+            Map<String, Object> payload = Map.of("meta", meta, "data", data);
 
             OutboxEntity entity = OutboxEntity.builder().tenantId(tenantId).topic(ticketTopic)
                     .recordKey(tenantId + ":" + t.getId()).payload(payload)
