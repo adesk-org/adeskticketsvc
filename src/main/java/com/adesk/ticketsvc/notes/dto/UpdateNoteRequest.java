@@ -2,16 +2,10 @@ package com.adesk.ticketsvc.notes.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UpdateNoteRequest {
 
-    @NotBlank
-    @Size(max = 50000)
-    private String content;
+public record UpdateNoteRequest(
+
+        @NotBlank(message = "content is required") @Size(max = 50000,
+                message = "content must be less than 50000 characters") String content) {
 }

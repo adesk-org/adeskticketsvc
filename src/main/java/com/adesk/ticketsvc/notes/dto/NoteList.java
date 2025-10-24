@@ -2,20 +2,25 @@ package com.adesk.ticketsvc.notes.dto;
 
 import java.util.List;
 import com.adesk.ticketsvc.notes.model.NoteEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class NoteList {
+public record NoteList(
 
-    private int total;
+        @PositiveOrZero(message = "total must be greater than or equal to 0") int total,
 
-    private int limit;
+        @Min(value = 1, message = "limit must be greater than 0") @Max(value = 1000,
+                message = "limit must be less or equal to than 1000") int limit,
 
-    private int offset;
+        @PositiveOrZero(message = "offset must be greater than or equal to 0") int offset,
 
-    private List<NoteEntity> items;
+        @Valid List<NoteEntity> items) {
+
+    @AssertTrue(message = "items size must be less than or equal to limit")
+    private boolean isItemsWithinLimit() {
+        return items == null || items.size() <= limit;
+    }
 }
