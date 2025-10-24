@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  mvc:
+    servlet:
+      path: /api/v0
   datasource:
     url: jdbc:postgresql://localhost:5432/adeskdb?currentSchema=ticket
     username: adesk_admin
